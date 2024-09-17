@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כמה יישובים בארץ אתה מכיר?</title>
+    <style>
+        body {
+            font-family: 'Alef', sans-serif;
+            background-color: lightblue;
+            color: blue;
+            text-align: center;
+            direction: rtl;
+        }
+        h1 {
+            font-size: 36px;
+            color: blue;
+        }
+        input {
+            font-size: 18px;
+            padding: 10px;
+            margin: 10px;
+            width: 300px;
+            border: 2px solid blue;
+            border-radius: 5px;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px;
+            margin: 10px;
+            background-color: lightblue;
+            border: 2px solid blue;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: blue;
+        }
+        .map-container {
+            margin-top: 20px;
+            width: 800px;
+            height: 600px;
+            display: inline-block;
+            border: 2px solid blue;
+        }
+        .feedback {
+            font-size: 20px;
+        }
+        .guessed-cities-table {
+            margin-top: 20px;
+            font-size: 18px;
+            color: black;
+        }
+        table {
+            width: 50%;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid blue;
+        }
+        #population-info {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        /* Animation for shaking the input box */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake {
+            animation: shake 0.3s;
+        }
+
+        /* Styling for copyright and contact */
+        .top-left-corner {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            text-align: left;
+            color: blue;
+        }
+        .top-left-corner a {
+            color: blue;
+            text-decoration: none;
+        }
+        .top-left-corner a:hover {
+            text-decoration: underline;
+        }
+    </style>
+    <!-- Load Leaflet.js library for interactive map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+
+    <div class="top-left-corner">
+        <p>© Shachar Benny, 2024</p>
+        <p><a href="mailto:shachar450@gmail.com">Contact Us</a></p>
+    </div>
+
+    <h1>כמה יישובים בארץ אתה מכיר?</h1>
+
+    <input type="text" id="city-input" placeholder="כתוב יישוב..." autocomplete="off">
+    <button onclick="submitCity()">שלח</button>
+    
+    <div id="feedback" class="feedback"></div>
+    
+    <div class="map-container">
+        <div id="map" style="width: 800px; height: 600px;"></div>
+    </div>
+
+    <div class="guessed-cities-table">
+        <h2>יישובים שנמצאו:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>יישוב</th>
+                    <th>אוכלוסיה</th>
+                </tr>
+            </thead>
+            <tbody id="city-list"></tbody>
+        </table>
+    </div>
+
+    <!-- Display total guessed population, total population, and percentage -->
+    <div id="population-info">
+        <p id="population-stats"></p>
+    </div>
+
+    <script>
+        // Initialize the map using Leaflet.js
+        const map = L.map('map').setView([31.0461, 34.8516], 6);
+
+        // Load tiles for the map (without labels)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+        }).addTo(map);
+
+        let circles = [];
+
+        // Function to submit city and dynamically add marker
+        function submitCity() {
+            const cityInput = document.getElementById('city-input');
+            const cityName = cityInput.value;
+            const feedback = document.getElementById('feedback');
+            const cityList = document.getElementById('city-list');
+            const currentZoom = map.getZoom();  // Get the current zoom level
+
+            // Clear previous shake animation class if it exists
+            cityInput.classList.remove('shake');
+
+            fetch('/submit_city', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ city_name: cityName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'correct') {
+                    feedback.textContent = "נמצא יישוב!";
+                    feedback.style.color = 'green';
+
+                    // Calculate base circle radius based on population
+                    const guessedCity = data.guessed_city;
+                    const scale_factor = 30;  // Adjust this factor as necessary
+                    const baseRadius = Math.sqrt(guessedCity.population) * scale_factor;
+
+                    // Adjust the radius based on the current zoom level
+                    const adjustedRadius = baseRadius * Math.pow(2, 6 - currentZoom);
+
+                    // Animate circle creation by starting with a small radius and growing to the final radius
+                    const circle = L.circle([guessedCity.latitude, guessedCity.longitude], {
+                        color: 'blue',
+                        fillColor: 'blue',
+                        fillOpacity: 0.7,
+                        radius: 0  // Start with zero radius for animation
+                    }).addTo(map).bindTooltip(`${guessedCity.name}: אוכלוסיה ${guessedCity.population}`, {permanent: false});
+
+                    // Smoothly animate the circle growing to its final size
+                    let currentRadius = 0;
+                    const growCircle = setInterval(() => {
+                        currentRadius += adjustedRadius / 20;  // Increase the radius gradually
+                        if (currentRadius >= adjustedRadius) {
+                            currentRadius = adjustedRadius;
+                            clearInterval(growCircle);  // Stop the animation when we reach the final size
+                        }
+                        circle.setRadius(currentRadius);
+                    }, 20);  // Adjust this timing for smoother/faster animations
+
+                    circles.push({ circle, baseRadius });  // Store the circle and its base radius for future scaling
+
+                    // Update the list of guessed cities
+                    cityList.innerHTML = '';
+                    data.guessed_cities.forEach(city => {
+                        const row = `<tr><td>${city.name}</td><td>${city.population}</td></tr>`;
+                        cityList.insertAdjacentHTML('beforeend', row);
+                    });
+
+                    // Update the population stats below the map
+                    const populationStats = `מצאת ${data.guessed_population.toLocaleString()} תושבים מתוך ${data.total_population.toLocaleString()} תושבים בארץ (${data.population_percentage.toFixed(2)}%)`;
+                    document.getElementById('population-stats').textContent = populationStats;
+
+                } else {
+                    feedback.textContent = "יישוב לא נמצא!";
+                    feedback.style.color = 'red';
+
+                    // Add the shake animation to the input box for invalid guess
+                    cityInput.classList.add('shake');
+                }
+            });
+
+            cityInput.value = '';  // Clear the input field after submission
+        }
+
+        // Listen for Enter keypress to submit the city
+        document.getElementById('city-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                submitCity();
+            }
+        });
+
+        // Adjust circle size based on zoom level while respecting the base radius from population
+        map.on('zoomend', function () {
+            const zoomLevel = map.getZoom();
+            circles.forEach(({ circle, baseRadius }) => {
+                const newRadius = baseRadius * Math.pow(2, 6 - zoomLevel);  // Adjust based on zoom level
+                
+                // Ensure the radius does not go below or above certain limits
+                const minRadius = baseRadius / 2;  // Minimum size as 50% of base radius
+                const maxRadius = baseRadius * 2;  // Maximum size as 200% of base radius
+                
+                const adjustedRadius = Math.max(minRadius, Math.min(maxRadius, newRadius));  // Adjust between min and max limits
+                
+                circle.setRadius(adjustedRadius);  // Update the circle radius
+            });
+        });
+
+    </script>
+
+</body>
+</html>
