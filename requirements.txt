@@ -1,7 +1,6 @@
 Flask==2.3.2
 gunicorn==20.1.0
-pandas==1.5.3
-numpy==1.23.5
+pandas==2.1.0  # If you are using pandas for CSV data
 folium==0.14.0
 requests==2.31.0
 beautifulsoup4==4.12.2
