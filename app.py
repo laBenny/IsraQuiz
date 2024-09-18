@@ -32,9 +32,10 @@ guessed_cities = []
 retry_strategy = Retry(
     total=3,  # Retry 3 times
     status_forcelist=[429, 500, 502, 503, 504],  # Retry on these status codes
-    method_whitelist=["GET"],  # Retry on GET requests
+    allowed_methods=["GET"],  # Retry on GET requests
     backoff_factor=1  # Exponential backoff factor
 )
+
 adapter = HTTPAdapter(max_retries=retry_strategy)
 http = requests.Session()
 http.mount("https://", adapter)
