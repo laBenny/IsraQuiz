@@ -255,7 +255,8 @@ def normalize_city_name(city_name):
 @app.route('/submit_city', methods=['POST'])
 def submit_city():
     city_name_input = request.json['city_name'].strip()
-
+    print(f"Submitted City Name: {city_name_input}")
+    
     # Normalize the user's input, handling special characters, hyphens, and י typos
     normalized_input = normalize_city_name_with_y_variation(city_name_input)
     print(f"Normalized Input: {normalized_input}")
@@ -281,6 +282,7 @@ def submit_city():
                 city_found = True
                 city_info = city_data
                 matched_city_name = city_name  # Match the original city name even if alternative is used
+                print(f"City Found via Alternate Name: {city_name}")
                 break
 
     # If the city is found and not already guessed, return success
