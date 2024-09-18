@@ -258,7 +258,7 @@ def submit_city():
 
     # Normalize the user's input, handling special characters, hyphens, and י typos
     normalized_input = normalize_city_name_with_y_variation(city_name_input)
-
+    print(f"Normalized Input: {normalized_input}")
     city_found = False
     city_info = None
     matched_city_name = None  # Store the original city name even if an alternative is matched
@@ -266,7 +266,7 @@ def submit_city():
     # Check if the city exists in the main city data or in its alternate names
     for city_name, city_data in city_data_dict.items():
         normalized_city_name = normalize_city_name_with_y_variation(city_name)
-
+        print(f"Checking city: {city_name}, Normalized: {normalized_city_name}")
         # Check against the normalized main city name
         if normalized_input == normalized_city_name:
             city_found = True
