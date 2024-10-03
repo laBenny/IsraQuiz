@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, jsonify
 import pandas as pd
 import folium
 import re
+import sqlite3
 
 app = Flask(__name__)
 
@@ -20,8 +21,49 @@ if 'Alternate Names' not in original_data.columns:
 # Initialize the city data dictionary
 city_data_dict = {}
 
-# Initialize guessed cities list to track which cities have been guessed during gameplay
-guessed_cities = []
+# Function to reset the game state
+def reset_game_state():
+    global guessed_cities
+    guessed_cities = []  # Reset the guessed cities list to an empty list
+    # You may also want to reset other game-related variables here, if necessary
+
+@app.route('/start_new_game', methods=['POST'])
+def start_new_game():
+    # Reset the game state when the player starts a new game
+    reset_game_state()
+    return jsonify({'status': 'new_game_started'})
+
+# Insert a new leaderboard entry
+def add_leaderboard_entry(player_name, cities_found, population_percentage, smallest_cities, time_taken, score):
+    conn = sqlite3.connect('leaderboard.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO leaderboard (player_name, cities_found, population_percentage, smallest_cities, time_taken, score)
+        VALUES (?, ?, ?, ?, ?, ?)
+    ''', (player_name, cities_found, population_percentage, ','.join(smallest_cities), time_taken, score))
+    conn.commit()
+    conn.close()
+
+
+
+def init_db():
+    conn = sqlite3.connect('leaderboard.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS leaderboard (
+            id INTEGER PRIMARY KEY,
+            player_name TEXT NOT NULL,
+            cities_found INTEGER NOT NULL,
+            population_percentage REAL NOT NULL,
+            smallest_cities TEXT NOT NULL,
+            time_taken INTEGER NOT NULL,
+            score REAL NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+
 
 
 # Map Initialization
@@ -69,6 +111,18 @@ def submit_city():
     # Normalize the user's input, handling special characters, hyphens, and י typos
     normalized_input = normalize_city_name_with_y_variation(city_name_input)
 
+    # Check if the city was already guessed (main name or alternate names)
+    for city in guessed_cities:
+        # Check against the main guessed city name
+        if normalized_input == normalize_city_name_with_y_variation(city['name']):
+            return jsonify({'status': 'duplicate'})  # City already guessed
+        
+        # Check against alternate names for the guessed city
+        if 'Alternate Names' in city and city['Alternate Names']:
+            for alt_name in city['Alternate Names']:
+                if normalized_input == normalize_city_name_with_y_variation(alt_name):
+                    return jsonify({'status': 'duplicate'})  # City already guessed via alternate name
+
     city_found = False
     city_info = None
     matched_city_name = None  # Store the original city name even if an alternative is matched
@@ -84,13 +138,13 @@ def submit_city():
             matched_city_name = city_name  # The original city name is matched
             break
 
-        # Check against alternative names (if they exist in city_data)
+        # Check against alternate names (if they exist in city_data)
         if 'Alternate Names' in city_data:
             normalized_alternates = [normalize_city_name_with_y_variation(alt_name) for alt_name in city_data['Alternate Names']]
             if normalized_input in normalized_alternates:
                 city_found = True
                 city_info = city_data
-                matched_city_name = city_name  # Match the original city name even if alternative is used
+                matched_city_name = city_name  # Match the original city name even if alternate name is used
                 break
 
     # If the city is found and not already guessed, return success
@@ -99,7 +153,8 @@ def submit_city():
             'name': matched_city_name,  # Return the original city name
             'latitude': city_info['Latitude'],
             'longitude': city_info['Longitude'],
-            'population': city_info['Population']
+            'population': city_info['Population'],
+            'Alternate Names': city_info.get('Alternate Names', [])  # Ensure alternate names are tracked
         })
 
         # Sort the guessed cities by population in descending order
@@ -143,6 +198,86 @@ def normalize_city_name_with_y_variation(city_name):
     return city_name
 
 
+@app.route('/submit_leaderboard', methods=['POST'])
+def submit_leaderboard():
+    data = request.json
+    player_name = data['player_name']
+    time_taken = data['time_taken']
+
+    # Sort the guessed cities by population to get the 5 smallest
+    smallest_cities = sorted(guessed_cities, key=lambda x: x['population'])[:5]
+    smallest_city_names = [city['name'] for city in smallest_cities]
+
+    # Get the number of cities found and the population percentage
+    cities_found = len(guessed_cities)
+    guessed_population = sum(city['population'] for city in guessed_cities)
+    total_population = sum(city['Population'] for city in city_data_dict.values() if city['Population'] is not None)
+    population_percentage = (guessed_population / total_population) * 100 if total_population > 0 else 0
+
+    # Calculate the player's score (you can adjust this formula)
+    score = (cities_found * population_percentage) / max(1,(time_taken / 60))  # Example formula
+
+    # Insert the data into the leaderboard
+    add_leaderboard_entry(player_name, cities_found, population_percentage, smallest_city_names, time_taken, score)
+
+    return jsonify({
+        'status': 'success',
+        'cities_found': cities_found,
+        'smallest_cities': smallest_city_names,
+        'population_percentage': population_percentage,
+        'time_taken': time_taken,
+    })
+
+@app.route('/skip_leaderboard', methods=['POST'])
+def skip_leaderboard():
+    data = request.json
+    time_taken = data['time_taken']  # We still need the time for the game summary
+
+    # Sort the guessed cities by population to get the 5 smallest
+    smallest_cities = sorted(guessed_cities, key=lambda x: x['population'])[:5]
+    smallest_city_names = [city['name'] for city in smallest_cities]
+
+    # Get the number of cities found and the population percentage
+    cities_found = len(guessed_cities)
+    guessed_population = sum(city['population'] for city in guessed_cities)
+    total_population = sum(city['Population'] for city in city_data_dict.values() if city['Population'] is not None)
+    population_percentage = (guessed_population / total_population) * 100 if total_population > 0 else 0
+
+    # Return the game summary without saving the score to the leaderboard
+    return jsonify({
+        'status': 'success',
+        'cities_found': cities_found,
+        'smallest_cities': smallest_city_names,
+        'population_percentage': population_percentage,
+        'time_taken': time_taken,
+    })
+
+
+# Function to get the top 10 players from the leaderboard based on score
+def get_top_leaderboard():
+    conn = sqlite3.connect('leaderboard.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT player_name, cities_found, population_percentage, time_taken, score 
+        FROM leaderboard
+        ORDER BY score DESC
+        LIMIT 10
+    ''')
+    leaderboard_entries = cursor.fetchall()
+    conn.close()
+
+    leaderboard = []
+    for entry in leaderboard_entries:
+        leaderboard.append({
+            'player_name': entry[0],
+            'cities_found': entry[1],
+            'population_percentage': entry[2],
+            'time_taken': entry[3],
+            'score': entry[4]
+        })
+
+    return leaderboard
+
 
 def load_data_from_file(file_path='data.csv'):
     # Load the data from the CSV file into a DataFrame
@@ -173,8 +308,18 @@ def load_data_from_file(file_path='data.csv'):
 
     return city_data_dict
 
+
+@app.route('/get_leaderboard', methods=['GET'])
+def get_leaderboard():
+    # Fetch the top 10 players from the leaderboard
+    leaderboard = get_top_leaderboard()
+    return jsonify({'leaderboard': leaderboard})
+
+
 # Example of loading the data from the CSV
 if __name__ == "__main__":
     city_data_dict = load_data_from_file('data.csv')
+    init_db()
+    reset_game_state()
     print("City data loaded successfully.")
     app.run(debug=True)
