@@ -492,11 +492,20 @@
         }
 
 
-        window.onload = function () {
-                // Clear any stored data (from localStorage, if applicable)
-                sessionStorage.clear();
+        window.onload = function() {
+            // Send a request to start a new game when a new window is opened
+            fetch('/start_new_game', {
+                method: 'POST'
+            }).then(response => response.json())
+            .then(data => {
+                if (data.status === 'new_game_started') {
+                    // Clear previous session data or variables if needed
+                    sessionStorage.clear();
+                    console.log("A new game has started");
+                }
+            });
+        };
 
-            };
 
 
             // Skip leaderboard submission and show game stats
