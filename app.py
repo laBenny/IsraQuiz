@@ -4,6 +4,7 @@ import folium
 import re
 import sqlite3
 import os
+import math
 
 app = Flask(__name__)
 
@@ -216,7 +217,8 @@ def submit_leaderboard():
     population_percentage = (guessed_population / total_population) * 100 if total_population > 0 else 0
 
     # Calculate the player's score (you can adjust this formula)
-    score = (cities_found * population_percentage) / max(1,(time_taken / 60))  # Example formula
+    score = (cities_found * population_percentage) * tanh(200 / time_taken)
+
 
     # Insert the data into the leaderboard
     add_leaderboard_entry(player_name, cities_found, population_percentage, smallest_city_names, time_taken, score)
