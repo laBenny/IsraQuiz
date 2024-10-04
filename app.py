@@ -172,6 +172,7 @@ def normalize_city_name_with_y_variation(city_name):
     return city_name
 
 
+
 @app.route('/submit_city', methods=['POST'])
 def submit_city():
     city_name_input = request.json['city_name'].strip()
@@ -181,8 +182,15 @@ def submit_city():
 
     # Check if the city was already guessed (main name or alternate names)
     for city in guessed_cities:
+        # Check against the main guessed city name
         if normalized_input == normalize_city_name_with_y_variation(city['name']):
             return jsonify({'status': 'duplicate'})  # City already guessed
+        
+        # Check against alternate names for the guessed city
+        if 'Alternate Names' in city and city['Alternate Names']:
+            for alt_name in city['Alternate Names']:
+                if normalized_input == normalize_city_name_with_y_variation(alt_name):
+                    return jsonify({'status': 'duplicate'})  # City already guessed via alternate name
 
     city_found = False
     city_info = None
@@ -192,30 +200,48 @@ def submit_city():
     for city_name, city_data in city_data_dict.items():
         normalized_city_name = normalize_city_name_with_y_variation(city_name)
 
+        # Check against the normalized main city name
         if normalized_input == normalized_city_name:
             city_found = True
             city_info = city_data
             matched_city_name = city_name  # The original city name is matched
             break
 
+        # Check against alternate names (if they exist in city_data)
+        if 'Alternate Names' in city_data:
+            normalized_alternates = [normalize_city_name_with_y_variation(alt_name) for alt_name in city_data['Alternate Names']]
+            if normalized_input in normalized_alternates:
+                city_found = True
+                city_info = city_data
+                matched_city_name = city_name  # Match the original city name even if alternate name is used
+                break
+
     # If the city is found and not already guessed, return success
     if city_found and matched_city_name not in [city['name'] for city in guessed_cities]:
         guessed_cities.append({
-            'name': matched_city_name,
+            'name': matched_city_name,  # Return the original city name
             'latitude': city_info['Latitude'],
             'longitude': city_info['Longitude'],
             'population': city_info['Population'],
+            'Alternate Names': city_info.get('Alternate Names', [])  # Ensure alternate names are tracked
         })
+
+        # Sort the guessed cities by population in descending order
+        guessed_cities.sort(key=lambda city: city['population'], reverse=True)
 
         # Calculate the total guessed population
         guessed_population = sum(city['population'] for city in guessed_cities)
+
+        # Calculate the total population of all cities in the dataset
         total_population = sum(city['Population'] for city in city_data_dict.values() if city['Population'] is not None)
+
+        # Calculate the percentage of the guessed population
         population_percentage = (guessed_population / total_population) * 100 if total_population > 0 else 0
 
         return jsonify({
             'status': 'correct',
             'guessed_city': {
-                'name': matched_city_name,
+                'name': matched_city_name,  # Return the main city name, not the alternative
                 'latitude': city_info['Latitude'],
                 'longitude': city_info['Longitude'],
                 'population': city_info['Population']
@@ -226,7 +252,7 @@ def submit_city():
             'population_percentage': population_percentage
         })
     else:
-        return jsonify({'status': 'incorrect'})
+        return jsonify({'status': 'incorrect', 'guessed_cities': guessed_cities})
 
 
 @app.route('/submit_leaderboard', methods=['POST'])
