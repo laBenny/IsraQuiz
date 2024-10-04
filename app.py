@@ -34,6 +34,9 @@ def start_new_game():
     reset_game_state()
     return jsonify({'status': 'new_game_started'})
 
+
+
+
 # Insert a new leaderboard entry
 def add_leaderboard_entry(player_name, cities_found, population_percentage, smallest_cities, time_taken, score):
     conn = sqlite3.connect('leaderboard.db')
@@ -96,6 +99,7 @@ def initialize_map():
 @app.route('/')
 def index():
     initialize_map()  # Ensure the map is initialized
+    reset_game_state()
     return render_template('index.html', guessed_cities=guessed_cities)
 
 
