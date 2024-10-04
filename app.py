@@ -4,6 +4,7 @@ import folium
 import re
 import sqlite3
 import os
+import math 
 
 app = Flask(__name__)
 
@@ -21,9 +22,6 @@ if 'Alternate Names' not in original_data.columns:
 
 # Initialize the city data dictionary
 city_data_dict = {}
-# Initialize guessed_cities globally
-guessed_cities = []
-
 
 # Function to reset the game state
 def reset_game_state():
@@ -119,13 +117,6 @@ def submit_city():
     # Normalize the user's input, handling special characters, hyphens, and י typos
     normalized_input = normalize_city_name_with_y_variation(city_name_input)
 
-
-    global guessed_cities  # Ensure you're accessing the global variable
-    # Ensure that guessed_cities is initialized before looping through it
-    if guessed_cities is None:
-        guessed_cities = []
-
-    
     # Check if the city was already guessed (main name or alternate names)
     for city in guessed_cities:
         # Check against the main guessed city name
@@ -230,7 +221,7 @@ def submit_leaderboard():
     population_percentage = (guessed_population / total_population) * 100 if total_population > 0 else 0
 
     # Calculate the player's score (you can adjust this formula)
-    score = (cities_found * population_percentage) / max(1,(time_taken / 60))  # Example formula
+    score = (cities_found * population_percentage) * math.tanh(200 / time_taken)
 
     # Insert the data into the leaderboard
     add_leaderboard_entry(player_name, cities_found, population_percentage, smallest_city_names, time_taken, score)
@@ -339,4 +330,3 @@ if __name__ == "__main__":
     print("City data loaded successfully.")
     port = int(os.environ.get("PORT", 5000))  # Default to 5000 for local dev
     app.run(host='0.0.0.0', port=port)
-    app.run(debug=True)
