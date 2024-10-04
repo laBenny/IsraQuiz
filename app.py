@@ -21,6 +21,9 @@ if 'Alternate Names' not in original_data.columns:
 
 # Initialize the city data dictionary
 city_data_dict = {}
+# Initialize guessed_cities globally
+guessed_cities = []
+
 
 # Function to reset the game state
 def reset_game_state():
