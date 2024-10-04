@@ -70,7 +70,7 @@ def init_db():
 
 # Map Initialization
 def initialize_map():
-    game_map = folium.Map(location=[31.0461, 34.8516], zoom_start=6, tiles=None)
+    game_map = folium.Map(location=[31.0461, 34.8516], zoom_start=7, tiles=None)
     folium.TileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png',
                      attr='CartoDB', name='No Labels').add_to(game_map)
 

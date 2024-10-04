@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כמה יישובים בארץ אתה מכיר?</title>
+    <style>
+        body {
+            font-family: 'Alef', sans-serif;
+            background-color: lightblue;
+            color: blue;
+            text-align: center;
+            direction: rtl;
+        }
+        h1 {
+            font-size: 36px;
+            color: blue;
+        }
+        input {
+            font-size: 18px;
+            padding: 10px;
+            margin: 10px;
+            width: 300px;
+            border: 2px solid blue;
+            border-radius: 5px;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px;
+            margin: 10px;
+            background-color: lightblue;
+            border: 2px solid blue;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: blue;
+        }
+        .map-container {
+            margin-top: 20px;
+            width: 800px;
+            height: 600px;
+            display: inline-block;
+            border: 2px solid blue;
+        }
+        .feedback {
+            font-size: 20px;
+        }
+        .guessed-cities-table {
+            margin-top: 20px;
+            font-size: 18px;
+            color: black;
+        }
+        table {
+            width: 50%;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid blue;
+        }
+        #population-info {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        #timer {
+            margin-top: 20px;
+            font-size: 18px;
+            color: blue;
+        }
+        /* Give Up Modal */
+        #give-up-modal, #leaderboard-entry {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border: 2px solid blue;
+            border-radius: 10px;
+            z-index: 9999; /* This ensures it's on top of everything, including the map */
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow for better visibility */
+        }
+
+        .modal-content button {
+            margin-right: 10px;
+        }
+        /* Animation for shaking the input box */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        .shake {
+            animation: shake 0.3s;
+        }
+        .celebration {
+            background-color: yellow;
+            border-radius: 50%;
+            padding: 20px;
+            animation: celebration 1s ease-in-out infinite;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        @keyframes celebration {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        /* Styling for copyright and contact */
+        .top-left-corner {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            text-align: left;
+            color: blue;
+        }
+        .top-left-corner a {
+            color: blue;
+            text-decoration: none;
+        }
+        .top-left-corner a:hover {
+            text-decoration: underline;
+        }
+
+
+
+        @media only screen and (max-width: 600px) {
+            body {
+                font-size: 14px;
+            }
+            input {
+                width: 80%;
+                font-size: 16px; /* Increase font size slightly for better readability */
+            }
+            button {
+                width: 80%;
+                font-size: 16px; /* Similarly, make buttons easier to read and tap */
+            }
+            .map-container {
+                width: 100%;
+                height: 300px;
+            }
+            table {
+                width: 100%;
+            }
+        }
+        .map-container {
+    margin: 10px auto; /* Centers the map on mobile with a small margin */
+}
+
+#give-up-modal, #leaderboard-entry {
+    max-width: 90%; /* Ensure modals don't exceed the width of smaller screens */
+}
+
+
+
+    </style>
+    <!-- Load Leaflet.js library for interactive map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+</head>
+<body>
+
+    <div class="top-left-corner">
+        <p>© Shachar Benny, 2024</p>
+        <p><a href="mailto:shachar450@gmail.com">Contact Us</a></p>
+        <button id="show-leaderboard-btn">לוח התוצאות</button> <!-- Leaderboard Button -->
+    </div>
+    
+    <script>
+        document.getElementById('show-leaderboard-btn').addEventListener('click', () => {
+            fetch('/get_leaderboard') // Call the new /get_leaderboard endpoint
+            .then(response => response.json())
+            .then(data => {
+                showLeaderboard(data.leaderboard); // Call your existing function to display the leaderboard
+            });
+        });
+
+    </script>
+    
+    <h1>כמה יישובים בארץ אתה מכיר?</h1>
+
+    <input type="text" id="city-input" placeholder="כתוב יישוב..." autocomplete="off">
+    <button onclick="submitCity()">שלח</button>
+    <button id="give-up-button">נכנעת?</button>
+
+    <div id="feedback" class="feedback"></div>
+    <div id="timer">זמן: 00:00</div>
+
+    <div class="map-container">
+        <div id="map" style="width: 800px; height: 600px;"></div>
+    </div>
+
+    <div class="guessed-cities-table">
+        <h2>יישובים שנמצאו:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>יישוב</th>
+                    <th>אוכלוסיה</th>
+                </tr>
+            </thead>
+            <tbody id="city-list"></tbody>
+        </table>
+    </div>
+
+    <!-- Display total guessed population, total population, and percentage -->
+    <div id="population-info">
+        <p id="population-stats"></p>
+    </div>
+
+    <!-- Give Up Modal -->
+    <div id="give-up-modal">
+        <div class="modal-content">
+            <p>נכנעת?</p>
+            <button id="yes-button">כן</button>
+            <button id="no-button">לא</button>
+        </div>
+    </div>
+
+    <!-- Leaderboard Display Section -->
+    <div id="leaderboard-display" style="display: none;">
+        <h2>לוח התוצאות</h2>
+    </div>
+
+    <!-- Leaderboard Entry -->
+    <div id="leaderboard-entry">
+        <p>הכנס את שמך כדי להצטרף ללוח התוצאות:</p>
+        <input type="text" id="player-name" placeholder="שם" />
+        <button id="submit-leaderboard">שלח</button>
+        <button id="skip-leaderboard">דלג</button> <!-- New Skip Button -->
+        <div id="game-stats"></div>
+    </div>
+    
+    <!-- Game Stats Section (Initially Hidden) -->
+    <div id="game-stats-section" style="display: none;">
+        <h2>סיכום המשחק שלך</h2>
+        <div id="game-stats-content"></div>
+        <button id="new-game-button">התחל משחק חדש</button>
+    </div>
+
+
+
+    <script>
+        let timer = null;
+        let timeElapsed = 0;
+        let circles = [];
+
+        // Start the timer
+        function startTimer() {
+            if (timer === null) {
+                timer = setInterval(() => {
+                    timeElapsed++;
+                    updateTimerDisplay();
+                }, 1000);
+            }
+        }
+
+        // Stop the timer
+        function stopTimer() {
+            if (timer !== null) {
+                clearInterval(timer);
+                timer = null;
+            }
+        }
+
+        // Update the timer display
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeElapsed / 60);
+            const seconds = timeElapsed % 60;
+            document.getElementById('timer').textContent = `זמן: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function displayGameSummary(data) {
+            const gameSummary = document.getElementById('game-summary');
+            const summaryContent = document.getElementById('summary-content');
+
+            // Calculate stats if data is not available (player skipped submission)
+            if (!data) {
+                // Get stats from the client-side data
+                const citiesFound = guessedCities.length;
+                const smallestCities = guessedCities
+                    .sort((a, b) => a.population - b.population)
+                    .slice(0, 5)
+                    .map(city => city.name);
+                const populationPercentage = (guessedPopulation / totalPopulation) * 100;
+
+                data = {
+                    cities_found: citiesFound,
+                    smallest_cities: smallestCities,
+                    population_percentage: populationPercentage,
+                };
+            }
+
+            // Build the summary content
+            const summaryHtml = `
+                <p>מספר יישובים שמצאת: ${data.cities_found}</p>
+                <p>5 היישובים הקטנים ביותר שמצאת: ${data.smallest_cities.join(', ')}</p>
+                <p>אחוז מהאוכלוסייה שמצאת: ${data.population_percentage.toFixed(2)}%</p>
+            `;
+            summaryContent.innerHTML = summaryHtml;
+
+            // Hide other modals and display the game summary
+            leaderboardEntry.style.display = 'none';
+            gameSummary.style.display = 'block';
+        }
+
+        // Event listener for the "New Game" button
+        document.getElementById('new-game-button').addEventListener('click', startNewGame);
+
+
+        // Initialize the map using Leaflet.js
+        const map = L.map('map').setView([31.0461, 34.8516], 7);
+
+        // Load tiles for the map (without labels)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://carto.com/">CartoDB</a>',
+        }).addTo(map);
+
+
+
+    function submitCity() {
+        const cityInput = document.getElementById('city-input');
+        const cityName = cityInput.value;
+        const feedback = document.getElementById('feedback');
+        const cityList = document.getElementById('city-list');
+        const currentZoom = map.getZoom();
+
+        cityInput.classList.remove('shake'); // Remove shake class to reset
+
+        fetch('/submit_city', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ city_name: cityName })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'correct') {
+                feedback.textContent = "נמצא יישוב!";
+                feedback.style.color = 'green';
+                startTimer(); // Start the timer when the first valid city is found
+
+                const guessedCity = data.guessed_city;
+                const scale_factor = 30;
+                const baseRadius = Math.sqrt(guessedCity.population) * scale_factor;
+                const adjustedRadius = baseRadius * Math.pow(2, 6 - currentZoom);
+
+                const circle = L.circle([guessedCity.latitude, guessedCity.longitude], {
+                    color: 'blue',
+                    fillColor: 'blue',
+                    fillOpacity: 0.7,
+                    radius: 0
+                }).addTo(map).bindTooltip(`${guessedCity.name}: אוכלוסיה ${guessedCity.population}`, { permanent: false });
+
+                let currentRadius = 0;
+                const growCircle = setInterval(() => {
+                    currentRadius += adjustedRadius / 20;
+                    if (currentRadius >= adjustedRadius) {
+                        currentRadius = adjustedRadius;
+                        clearInterval(growCircle);
+                    }
+                    circle.setRadius(currentRadius);
+                }, 20);
+
+                circles.push({ circle, baseRadius });
+
+                cityList.innerHTML = '';
+                data.guessed_cities.forEach(city => {
+                    const row = `<tr><td>${city.name}</td><td>${city.population}</td></tr>`;
+                    cityList.insertAdjacentHTML('beforeend', row);
+                });
+
+                const populationStats = `מצאת ${data.guessed_population.toLocaleString()} תושבים מתוך ${data.total_population.toLocaleString()} תושבים בארץ (${data.population_percentage.toFixed(2)}%)`;
+                document.getElementById('population-stats').textContent = populationStats;
+
+            } else if (data.status === 'duplicate') {
+                // Case when the city has already been guessed
+                feedback.textContent = "היישוב נכתב כבר!";
+                feedback.style.color = 'orange';
+                cityInput.classList.add('shake'); // Add shake effect for duplicate city
+            } else {
+                feedback.textContent = "יישוב לא נמצא!";
+                feedback.style.color = 'red';
+                cityInput.classList.add('shake'); // Add shake effect for invalid city
+            }
+        });
+
+        cityInput.value = '';
+    }
+
+        document.getElementById('city-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                submitCity();
+            }
+        });
+
+        map.on('zoomend', function () {
+            const zoomLevel = map.getZoom();
+            circles.forEach(({ circle, baseRadius }) => {
+                const newRadius = baseRadius * Math.pow(2, 6 - zoomLevel);
+                const minRadius = baseRadius / 4;
+                const maxRadius = baseRadius * 2;
+                const adjustedRadius = Math.max(minRadius, Math.min(maxRadius, newRadius));
+                circle.setRadius(adjustedRadius);
+            });
+        });
+
+        // Give Up Modal Logic
+        const giveUpButton = document.getElementById('give-up-button');
+        const giveUpModal = document.getElementById('give-up-modal');
+        const leaderboardEntry = document.getElementById('leaderboard-entry');
+        const playerNameInput = document.getElementById('player-name');
+
+        // Show the give-up modal when the user clicks the 'give up' button
+        giveUpButton.addEventListener('click', () => {
+            giveUpModal.style.display = 'block';
+        });
+
+        // Handle the user's confirmation to give up
+        document.getElementById('yes-button').addEventListener('click', () => {
+            giveUpModal.style.display = 'none';
+            stopTimer(); // Stop the game timer
+            displayLeaderboardEntry(); // Show the leaderboard entry form
+        });
+
+
+
+
+        // Close the give-up modal if the user chooses not to give up
+        document.getElementById('no-button').addEventListener('click', () => {
+            giveUpModal.style.display = 'none';
+        });
+
+        function lockGameInput() {
+            const cityInput = document.getElementById('city-input');
+            cityInput.disabled = true;
+            cityInput.placeholder = 'המשחק הסתיים';
+            document.querySelector('button[onclick="submitCity()"]').disabled = true;
+        }
+            function startNewGame() {
+                fetch('/start_new_game', {
+                    method: 'POST'
+                }).then(response => response.json())
+                .then(data => {
+                    if (data.status === 'new_game_started') {
+                        location.reload(); // Reload the page to reset the game state
+                    }
+                });
+            }
+
+            // Event listener for the "Start New Game" button
+            document.getElementById('new-game-button').addEventListener('click', startNewGame);
+
+
+
+        // Helper function to hide the leaderboard entry
+        function hideLeaderboardEntry() {
+            leaderboardEntry.style.display = 'none';
+        }
+
+        // Handle submission and end the game
+        document.getElementById('submit-leaderboard').addEventListener('click', () => {
+            const playerName = playerNameInput.value;
+            if (playerName) {
+                const timeTaken = timeElapsed;
+
+                // Send data to backend
+                fetch('/submit_leaderboard', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        player_name: playerName,
+                        time_taken: timeTaken
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Hide leaderboard entry, game elements, and show game stats
+                        hideLeaderboardEntry();
+                        hideGameElements();
+                        endGame(data);  // Use backend data for game stats display
+                    }
+                });
+            }
+        });
+
+        function captureGameStats() {
+            const citiesFound = guessedCities.length;
+            const smallestCities = guessedCities
+                .sort((a, b) => a.population - b.population)
+                .slice(0, 5)
+                .map(city => city.name);
+            const guessedPopulation = guessedCities.reduce((acc, city) => acc + city.population, 0);
+            
+            // Ensure totalCityPopulation is defined and correct
+            const totalPopulation = totalCityPopulation; 
+            
+            const populationPercentage = (guessedPopulation / totalPopulation) * 100;
+
+            // Debugging: Log the data being captured
+            console.log("Cities found: ", citiesFound);
+            console.log("Smallest cities: ", smallestCities);
+            console.log("Guessed population: ", guessedPopulation);
+            console.log("Total population: ", totalPopulation);
+            console.log("Population percentage: ", populationPercentage);
+
+            return {
+                cities_found: citiesFound,
+                smallest_cities: smallestCities,
+                population_percentage: populationPercentage
+            };
+        }
+
+
+        window.onload = function() {
+            // Send a request to start a new game when a new window is opened
+            fetch('/start_new_game', {
+                method: 'POST'
+            }).then(response => response.json())
+            .then(data => {
+                if (data.status === 'new_game_started') {
+                    // Clear previous session data or variables if needed
+                    sessionStorage.clear();
+                    console.log("A new game has started");
+                }
+            });
+        };
+
+
+
+            // Skip leaderboard submission and show game stats
+            document.getElementById('skip-leaderboard').addEventListener('click', () => {
+                // Hide leaderboard entry
+                hideLeaderboardEntry();
+
+                // Hide map and other game elements
+                hideGameElements();
+
+                // Send data to skip the leaderboard
+                fetch('/skip_leaderboard', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        time_taken: timeElapsed // Send time taken to the backend
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        endGame(data);  // Display the game summary based on the returned stats
+                    }
+                });
+            });
+
+
+            // Function to hide game elements after the game ends
+            function hideGameElements() {
+                document.getElementById('city-input').style.display = 'none';
+                document.querySelector('button[onclick="submitCity()"]').style.display = 'none';
+                document.getElementById('give-up-button').style.display = 'none';
+                document.getElementById('feedback').style.display='none';
+                document.getElementById('map').style.display = 'none';  // Hide the map
+            }
+
+        // Function to display leaderboard entry
+        function displayLeaderboardEntry() {
+            leaderboardEntry.style.display = 'block';
+            displayGameSummary(); // Optionally show game statistics after the user gives up
+        }
+
+        // Handle the user's confirmation to give up
+        document.getElementById('yes-button').addEventListener('click', () => {
+            giveUpModal.style.display = 'none';
+            stopTimer(); // Stop the game timer
+            displayLeaderboardEntry(); // Show the leaderboard entry form
+        });
+
+        // Close the give-up modal if the user chooses not to give up
+        document.getElementById('no-button').addEventListener('click', () => {
+            giveUpModal.style.display = 'none';
+        });
+
+        function endGame(data) {
+                // Hide remaining game elements
+                hideGameElements();
+                hideLeaderboardEntry();
+
+                // Update the map container to show game stats instead
+                const mapContainer = document.querySelector('.map-container');
+                const gameStatsContent = `
+                    <h2>סיכום המשחק שלך</h2>
+                    <p>מספר יישובים שמצאת: ${data.cities_found}</p>
+                    <p>5 היישובים הקטנים ביותר שמצאת: ${data.smallest_cities.join(', ')}</p>
+                    <p>אחוז מהאוכלוסייה שמצאת: ${data.population_percentage.toFixed(2)}%</p>
+                    <button id="new-game-button">התחל משחק חדש</button>
+                `;
+                mapContainer.innerHTML = gameStatsContent;
+
+                // Add event listener for the "Start New Game" button
+                document.getElementById('new-game-button').addEventListener('click', startNewGame);
+            }
+
+
+
+
+
+        // Function to lock the textbox and prevent further input
+        function lockTextbox() {
+            const cityInput = document.getElementById('city-input');
+            cityInput.disabled = true; // Disable the textbox
+            cityInput.placeholder = 'המשחק הסתיים'; // Update placeholder to indicate game over
+
+            // Show the "New Game" button
+            const newGameButton = document.createElement('button');
+            newGameButton.textContent = "התחל משחק חדש";
+            newGameButton.className = "new-game-btn";
+            newGameButton.onclick = startNewGame;
+            document.body.appendChild(newGameButton); // Add the button to the page
+        }
+
+    // Function to display the leaderboard in a new window
+    function showLeaderboard(leaderboard) {
+        let leaderboardWindow = window.open("", "Leaderboard", "width=600,height=400");
+        
+        // Write HTML content for the new window
+        let leaderboardHtml = `
+            <html lang="he" dir="rtl">
+            <head>
+                <title>לוח התוצאות</title>
+                <style>
+                    body {
+                        font-family: 'Alef', sans-serif;
+                        background-color: lightblue;
+                        color: blue;
+                        text-align: center;
+                        direction: rtl;
+                    }
+                    h2 {
+                        font-size: 24px;
+                        color: blue;
+                    }
+                    table {
+                        width: 100%;
+                        margin-top: 20px;
+                        border-collapse: collapse;
+                        text-align: center;
+                    }
+                    th, td {
+                        padding: 10px;
+                        border: 1px solid blue;
+                    }
+                </style>
+            </head>
+            <body>
+                <h2>לוח התוצאות - עשרת השחקנים המובילים</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>שם</th>
+                            <th>יישובים שנמצאו</th>
+                            <th>אחוז מהאוכלוסיה</th>
+                            <th>זמן</th>
+                            <th>ניקוד</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        // Add leaderboard rows
+        leaderboard.forEach(entry => {
+            leaderboardHtml += `
+                <tr>
+                    <td>${entry.player_name}</td>
+                    <td>${entry.cities_found}</td>
+                    <td>${entry.population_percentage.toFixed(2)}%</td>
+                    <td>${Math.floor(entry.time_taken / 60)} דקות ${entry.time_taken % 60} שניות</td>
+                    <td>${entry.score.toFixed(2)}</td>
+                </tr>
+            `;
+        });
+
+        leaderboardHtml += `
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        // Write the HTML to the new window
+        leaderboardWindow.document.write(leaderboardHtml);
+        leaderboardWindow.document.close(); // Close the document stream
+    }
+
+    
+
+</script>
+
+</body>
+</html>
