@@ -116,6 +116,13 @@ def submit_city():
     # Normalize the user's input, handling special characters, hyphens, and י typos
     normalized_input = normalize_city_name_with_y_variation(city_name_input)
 
+
+    global guessed_cities  # Ensure you're accessing the global variable
+    # Ensure that guessed_cities is initialized before looping through it
+    if guessed_cities is None:
+        guessed_cities = []
+
+    
     # Check if the city was already guessed (main name or alternate names)
     for city in guessed_cities:
         # Check against the main guessed city name
