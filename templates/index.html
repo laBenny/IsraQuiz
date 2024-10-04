@@ -136,31 +136,30 @@
             body {
                 font-size: 14px;
             }
-            input {
-                width: 80%;
-                font-size: 16px; /* Increase font size slightly for better readability */
-            }
-            button {
-                width: 80%;
-                font-size: 16px; /* Similarly, make buttons easier to read and tap */
-            }
+            input, button {
+            display: block;
+            margin: 10px auto; /* Centers them horizontally */
+            width: 80%; /* Ensures they are not too wide */
+        }
+
             .map-container {
                 width: 40%;
-                height: 300px;
+                height: 200px;
+                 margin: 10px auto; /* Centers the map on mobile with a small margin */
             }
             table {
                 width: 100%;
             }
+            #show-leaderboard-btn {
+                padding: 10px 20px;
+                font-size: 18px;
+                margin-top: 15px;
+            }      
+
+        #give-up-modal, #leaderboard-entry {
+            max-width: 90%; /* Ensure modals don't exceed the width of smaller screens */
         }
-        .map-container {
-    margin: 10px auto; /* Centers the map on mobile with a small margin */
-}
-
-#give-up-modal, #leaderboard-entry {
-    max-width: 90%; /* Ensure modals don't exceed the width of smaller screens */
-}
-
-
+        }
 
     </style>
     <!-- Load Leaflet.js library for interactive map -->
