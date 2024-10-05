@@ -21,11 +21,13 @@ body {
     margin: 0;
     line-height: 1.6;
 }
-/* Prevent body from scrolling when keyboard is shown */
+/* Prevent scrolling back to the input field */
 body.input-focused {
     position: fixed;
     width: 100%;
+    overflow: hidden;
 }
+
 
 
 h1 {
@@ -124,9 +126,11 @@ th, td {
     width: 90%;
     max-width: 400px;
 }
-#city-input {
-    touch-action: manipulation; /* Prevents unnecessary scrolling when interacting */
+/* Disable scroll anchoring for the map container and input elements */
+.map-container, #city-input {
+    overflow-anchor: none; /* Prevents scroll position from jumping */
 }
+
 
 .modal-content button {
     margin: 10px 5px;
@@ -265,19 +269,16 @@ th, td {
                 showLeaderboard(data.leaderboard); // Call your existing function to display the leaderboard
             });
         });
-            // Save scroll position
-            let scrollPos = window.pageYOffset;
+        const inputField = document.getElementById('city-input');
 
-            // Prevent scrolling when the input is focused
-            document.getElementById('city-input').addEventListener('focus', function(event) {
-                event.preventDefault();
-                window.scrollTo(0, scrollPos);
+            inputField.addEventListener('focus', function() {
+                document.body.classList.add('input-focused');
             });
 
-            // Restore scroll position when input loses focus
-            document.getElementById('city-input').addEventListener('blur', function() {
-                scrollPos = window.pageYOffset;
+            inputField.addEventListener('blur', function() {
+                document.body.classList.remove('input-focused');
             });
+
             // Prevent the page from scrolling when touching the input field
             inputField.addEventListener('touchstart', function(e) {
                 e.preventDefault();  // This prevents the page from scrolling
