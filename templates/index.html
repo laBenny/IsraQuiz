@@ -262,6 +262,11 @@ th, td {
             // Optionally blur the element if needed, but this might prevent typing
                 });
 
+        document.getElementById('city-input').addEventListener('focus', function() {
+            this.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        });
+
+
 
     </script>
     
