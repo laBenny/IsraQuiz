@@ -5,166 +5,206 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>כמה יישובים בארץ אתה מכיר?</title>
     <style>
-        body {
-            font-family: 'Alef', sans-serif;
-            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-            color: blue;
-            text-align: center;
-            direction: rtl;
-        }
+/* Base styles */
+body {
+    font-family: 'Alef', sans-serif;
+    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+    color: blue;
+    text-align: center;
+    direction: rtl;
+    padding: 20px;
+    margin: 0;
+    line-height: 1.6;
+}
 
-        h1 {
-            font-size: 36px;
-            color: blue;
-        }
-        input {
-            font-size: 18px;
-            padding: 10px;
-            margin: 10px;
-            width: 300px;
-            border: 2px solid blue;
-            border-radius: 5px;
-        }
-        button {
-            font-size: 18px;
-            padding: 10px;
-            margin: 10px;
-            background-color: lightblue;
-            border: 2px solid blue;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: blue;
-        }
-        .map-container {
-            margin-top: 20px;
-            width: 800px;
-            height: 600px;
-            display: inline-block;
-            border: 2px solid blue;
-        }
-        .feedback {
-            font-size: 20px;
-        }
-        .guessed-cities-table {
-            margin-top: 20px;
-            font-size: 18px;
-            color: black;
-        }
-        table {
-            width: 50%;
-            margin: 0 auto;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid blue;
-        }
-        #population-info {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-        #timer {
-            margin-top: 20px;
-            font-size: 18px;
-            color: blue;
-        }
-        /* Give Up Modal */
-        #give-up-modal, #leaderboard-entry {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border: 2px solid blue;
-            border-radius: 10px;
-            z-index: 9999; /* This ensures it's on top of everything, including the map */
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow for better visibility */
-        }
+h1 {
+    font-size: 2.5rem;
+    color: blue;
+    margin-bottom: 1rem;
+}
 
-        .modal-content button {
-            margin-right: 10px;
-        }
-        /* Animation for shaking the input box */
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-        .shake {
-            animation: shake 0.3s;
-        }
-        .celebration {
-            background-color: yellow;
-            border-radius: 50%;
-            padding: 20px;
-            animation: celebration 1s ease-in-out infinite;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        @keyframes celebration {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        /* Styling for copyright and contact */
-        .top-left-corner {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            text-align: left;
-            color: blue;
-        }
-        .top-left-corner a {
-            color: blue;
-            text-decoration: none;
-        }
-        .top-left-corner a:hover {
-            text-decoration: underline;
-        }
+input, button {
+    font-size: 1rem;
+    padding: 12px;
+    margin: 10px;
+    border: 2px solid blue;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 300px;
+    box-sizing: border-box;
+}
 
+button {
+    background-color: lightblue;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
+button:hover {
+    background-color: blue;
+}
 
-        @media only screen and (max-width: 600px) {
-            body {
-                font-size: 14px;
-            }
-            input, button {
-            display: block;
-            margin: 10px auto; /* Centers them horizontally */
-            width: 80%; /* Ensures they are not too wide */
-        }
+.map-container {
+    margin: 20px auto;
+    width: 100%;
+    max-width: 800px;
+    height: 60vh;
+    border: 2px solid blue;
+}
 
-            .map-container {
-                width: 100%;
-                height: 300px;
-            }
-            table {
-                width: 100%;
-            }
-            #show-leaderboard-btn {
-                padding: 10px 20px;
-                font-size: 18px;
-                margin-top: 15px;
-            }
+.feedback {
+    font-size: 1.2rem;
+    margin: 1rem 0;
+}
 
-                    .map-container {
-                margin: 10px auto; /* Centers the map on mobile with a small margin */
-            }
-        
+.guessed-cities-table {
+    margin: 20px auto;
+    width: 100%;
+    max-width: 600px;
+    font-size: 1rem;
+    color: black;
+}
 
-        #give-up-modal, #leaderboard-entry {
-            max-width: 90%; /* Ensure modals don't exceed the width of smaller screens */
-        }
-        }
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border: 1px solid blue;
+}
+
+#population-info, #timer {
+    margin-top: 20px;
+    font-size: 1rem;
+}
+
+/* Modal styles */
+#give-up-modal, #leaderboard-entry {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 2px solid blue;
+    border-radius: 10px;
+    z-index: 9999;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 400px;
+}
+
+.modal-content button {
+    margin: 10px 5px;
+}
+
+/* Animations */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.shake {
+    animation: shake 0.3s;
+}
+
+.celebration {
+    background-color: yellow;
+    border-radius: 50%;
+    padding: 20px;
+    animation: celebration 1s ease-in-out infinite;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes celebration {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* Copyright and contact styles */
+.top-left-corner {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    text-align: left;
+    color: blue;
+    font-size: 0.8rem;
+}
+
+.top-left-corner a {
+    color: blue;
+    text-decoration: none;
+}
+
+.top-left-corner a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 600px) {
+    body {
+        font-size: 16px;
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    input, button {
+        font-size: 1rem;
+        padding: 10px;
+        margin: 8px auto;
+        width: 90%;
+    }
+
+    .map-container {
+        height: 50vh;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+
+    #show-leaderboard-btn {
+        padding: 10px;
+        font-size: 1rem;
+        margin-top: 15px;
+    }
+
+    #give-up-modal, #leaderboard-entry {
+        padding: 15px;
+    }
+
+    .top-left-corner {
+        position: static;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+}
+
+/* Additional improvements for larger screens */
+@media only screen and (min-width: 1024px) {
+    body {
+        font-size: 18px;
+    }
+
+    .map-container {
+        height: 70vh;
+    }
+
+    input, button {
+        font-size: 1.1rem;
+    }
+}
 
 
 
