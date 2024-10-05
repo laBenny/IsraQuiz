@@ -6,10 +6,14 @@
     <title>כמה יישובים בארץ אתה מכיר?</title>
     <style>
 /* Base styles */
+/* Import Google Fonts for fancier options */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Amatic+SC:wght@400;700&display=swap');
+
+/* Base styles */
 body {
-    font-family: 'Alef', sans-serif;
+    font-family: 'Playfair Display', 'David Libre', serif; /* Fancy English font, fallback to a Hebrew-supporting serif */
     background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-    color: blue;
+    color: black; /* Changed from blue to black */
     text-align: center;
     direction: rtl;
     padding: 20px;
@@ -18,41 +22,48 @@ body {
 }
 
 h1 {
+    font-family: 'Amatic SC', 'Guttman Yad', cursive; /* Fancy decorative font, fallback to a decorative Hebrew font */
     font-size: 2.5rem;
-    color: blue;
+    color: black; /* Changed from blue to black */
     margin-bottom: 1rem;
 }
 
+input {
+    font-family: 'Playfair Display', 'David Libre', serif;
+    font-size: 18px;
+    padding: 10px;
+    margin: 10px;
+    width: 300px;
+    border: 2px solid black; /* Changed from blue to black */
+    border-radius: 5px;
+}
 
+/* Reverted to original button style */
 button {
+    font-family: 'Playfair Display', 'David Libre', serif;
+    font-size: 18px;
+    padding: 10px;
+    margin: 10px;
     background-color: lightblue;
-    color: white;
+    border: 2px solid black; /* Changed from blue to black */
+    color: black; /* Changed to black for better contrast on lightblue */
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    border-radius: 5px;
 }
 
 button:hover {
-    background-color: blue;
+    background-color: #0056b3; /* Darker blue on hover */
+    color: white; /* White text on hover for contrast */
 }
 
 .map-container {
     margin: 20px auto;
-    width: 100%;
+    width: 95%;
     max-width: 800px;
     height: 60vh;
-    border: 2px solid blue;
+    border: 2px solid black; /* Changed from blue to black */
 }
 
-input, button {
-    font-size: 1rem;
-    padding: 12px;
-    margin: 10px;
-    border: 2px solid blue;
-    border-radius: 5px;
-    width: 300px; /* Set a fixed width for larger screens */
-    max-width: 100%; /* Ensure it doesn't overflow on small screens */
-    box-sizing: border-box;
-}
 .feedback {
     font-size: 1.2rem;
     margin: 1rem 0;
@@ -73,7 +84,7 @@ table {
 
 th, td {
     padding: 10px;
-    border: 1px solid blue;
+    border: 1px solid black; /* Changed from blue to black */
 }
 
 #population-info, #timer {
@@ -90,7 +101,7 @@ th, td {
     transform: translate(-50%, -50%);
     background-color: white;
     padding: 20px;
-    border: 2px solid blue;
+    border: 2px solid black; /* Changed from blue to black */
     border-radius: 10px;
     z-index: 9999;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
@@ -135,12 +146,12 @@ th, td {
     top: 10px;
     left: 10px;
     text-align: left;
-    color: blue;
+    color: black; /* Changed from blue to black */
     font-size: 0.8rem;
 }
 
 .top-left-corner a {
-    color: blue;
+    color: black; /* Changed from blue to black */
     text-decoration: none;
 }
 
@@ -150,27 +161,24 @@ th, td {
 
 /* Responsive styles */
 @media only screen and (max-width: 600px) {
-
-
-    .map-container {
-        height: 50vh;
-        width: 95%; /* Slightly narrower on mobile */
-        max-width: none; /* Allow it to be narrower than 800px on mobile */
-    }
     body {
         font-size: 16px;
         padding: 10px;
     }
 
     h1 {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
 
     input, button {
-        font-size: 1rem;
+        font-size: 16px;
         padding: 10px;
         margin: 8px auto;
         width: 90%;
+    }
+
+    .map-container {
+        height: 50vh;
     }
 
     table {
@@ -179,7 +187,7 @@ th, td {
 
     #show-leaderboard-btn {
         padding: 10px;
-        font-size: 1rem;
+        font-size: 16px;
         margin-top: 15px;
     }
 
@@ -205,13 +213,9 @@ th, td {
     }
 
     input, button {
-        font-size: 1.1rem;
-        width: 300px; /* Fixed width for larger screens */
+        width: auto; /* Allow buttons to size based on content */
     }
 }
-
-
-
     </style>
     <!-- Load Leaflet.js library for interactive map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
