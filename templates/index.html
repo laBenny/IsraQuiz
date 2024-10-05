@@ -126,10 +126,15 @@ th, td {
     width: 90%;
     max-width: 400px;
 }
-/* Disable scroll anchoring for the map container and input elements */
-.map-container, #city-input {
-    overflow-anchor: none; /* Prevents scroll position from jumping */
+
+#city-input {
+    position: sticky;
+    top: 10px; /* Distance from the top of the viewport */
+    z-index: 1000; /* Ensure it stays above other content */
+    width: 100%; /* Ensure it fills the width */
+    padding: 10px; /* Optional padding for better appearance */
 }
+
 
 
 .modal-content button {
@@ -269,29 +274,6 @@ th, td {
                 showLeaderboard(data.leaderboard); // Call your existing function to display the leaderboard
             });
         });
-
-        
-        let scrollPos = window.pageYOffset;
-
-            document.getElementById('city-input').addEventListener('focus', function() {
-                // Lock the scroll position when input is focused
-                scrollPos = window.pageYOffset;
-                window.scrollTo(0, scrollPos);
-                
-                // Optionally, lock body scrolling completely
-                document.body.style.position = 'fixed';
-                document.body.style.top = `-${scrollPos}px`;
-                document.body.style.width = '100%';
-            });
-
-            document.getElementById('city-input').addEventListener('blur', function() {
-                // Re-enable scroll when input loses focus
-                document.body.style.position = '';
-                document.body.style.top = '';
-                window.scrollTo(0, scrollPos); // Restore the scroll position
-            });
-
-
 
 
 
