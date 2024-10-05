@@ -256,15 +256,20 @@ th, td {
                 showLeaderboard(data.leaderboard); // Call your existing function to display the leaderboard
             });
         });
-        document.getElementById('city-input').addEventListener('focus', function(event) {
-            // Prevent the default scroll behavior when input is focused
-            event.preventDefault();
-            // Optionally blur the element if needed, but this might prevent typing
-                });
+            // Save scroll position
+            let scrollPos = window.pageYOffset;
 
-        document.getElementById('city-input').addEventListener('focus', function() {
-            this.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-        });
+            // Prevent scrolling when the input is focused
+            document.getElementById('city-input').addEventListener('focus', function(event) {
+                event.preventDefault();
+                window.scrollTo(0, scrollPos);
+            });
+
+            // Restore scroll position when input loses focus
+            document.getElementById('city-input').addEventListener('blur', function() {
+                scrollPos = window.pageYOffset;
+            });
+
 
 
 
