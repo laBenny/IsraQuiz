@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify,session
 import pandas as pd
 import folium
 import re
@@ -9,7 +9,7 @@ import psycopg2
 from urllib.parse import urlparse
 
 app = Flask(__name__)
-
+app.secret_key = os.environ.get("SECRET_KEY", "safgfhjhk")
 
 # Get the DATABASE_URL from Heroku environment variables
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -73,15 +73,18 @@ guessed_cities = []  # Initialize global guessed cities list
 
 # Function to reset the game state
 def reset_game_state():
-    global guessed_cities
-    guessed_cities = []  # Reset the guessed cities list to an empty list
+    session['guessed_cities'] = []
+
+# Function to get the current game state
+def get_guessed_cities():
+    return session.get('guessed_cities', [])
 
 
 @app.route('/start_new_game', methods=['POST'])
 def start_new_game():
-    # Reset the game state when the player starts a new game
-    reset_game_state()
+    reset_game_state()  # This will reset only the current player's session
     return jsonify({'status': 'new_game_started'})
+
 
 
 # Insert a new leaderboard entry into PostgreSQL
@@ -152,7 +155,7 @@ def initialize_map():
 @app.route('/')
 def index():
     initialize_map()  # Ensure the map is initialized
-    return render_template('index.html', guessed_cities=guessed_cities)
+    return render_template('index.html', guessed_cities=session['guessed_cities'])
 
 
 # Helper function to normalize city names by removing special characters and converting to lowercase
@@ -179,6 +182,10 @@ def submit_city():
 
     # Normalize the user's input, handling special characters, hyphens, and י typos
     normalized_input = normalize_city_name_with_y_variation(city_name_input)
+
+
+    guessed_cities = get_guessed_cities()  # Fetch the player's session-specific data
+    
 
     # Check if the city was already guessed (main name or alternate names)
     for city in guessed_cities:
@@ -238,6 +245,12 @@ def submit_city():
         # Calculate the percentage of the guessed population
         population_percentage = (guessed_population / total_population) * 100 if total_population > 0 else 0
 
+
+
+        # The rest of your logic remains the same, but updates guessed cities in the session
+        session['guessed_cities'] = guessed_cities
+
+
         return jsonify({
             'status': 'correct',
             'guessed_city': {
@@ -260,6 +273,8 @@ def submit_leaderboard():
     data = request.json
     player_name = data['player_name']
     time_taken = data['time_taken']
+
+    guessed_cities = get_guessed_cities()  # Fetch the player's session-specific data
 
     # Sort the guessed cities by population to get the 5 smallest
     smallest_cities = sorted(guessed_cities, key=lambda x: x['population'])[:5]
