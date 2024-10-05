@@ -68,6 +68,10 @@ button:hover {
     height: 60vh;
     border: 2px solid black; /* Changed from blue to black */
 }
+#map {
+        width: 100%;
+        height: 100%; /* Ensure map always takes the full container */
+    }
 
 .feedback {
     font-size: 1.2rem;
@@ -187,6 +191,10 @@ th, td {
     .map-container {
         height: 50vh;
     }
+    #map {
+        width: 100%;
+        height: 100%; /* Ensure map always takes the full container */
+    }
 
     table {
         font-size: 0.9rem;
@@ -217,6 +225,10 @@ th, td {
 
     .map-container {
         height: 70vh;
+    }
+    #map {
+        width: 100%;
+        height: 100%; /* Ensure map always takes the full container */
     }
 
     input, button {
@@ -257,7 +269,7 @@ th, td {
     <div id="timer">זמן: 00:00</div>
 
     <div class="map-container">
-        <div id="map" style="width: 800px; height: 600px;"></div>
+        <div id="map"></div>
     </div>
 
     <div class="guessed-cities-table">
