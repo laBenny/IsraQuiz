@@ -278,6 +278,10 @@ th, td {
             document.getElementById('city-input').addEventListener('blur', function() {
                 scrollPos = window.pageYOffset;
             });
+            // Prevent the page from scrolling when touching the input field
+            inputField.addEventListener('touchstart', function(e) {
+                e.preventDefault();  // This prevents the page from scrolling
+            });
 
 
 
