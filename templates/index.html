@@ -11,9 +11,9 @@
 
 /* Base styles */
 body {
-    font-family: 'Playfair Display', 'David Libre', 'Amatic SC'; /* Fancy English font, fallback to a Hebrew-supporting serif */
+    font-family: 'Assistant', 'Rubik', sans-serif; /* Assistant for English, Rubik for Hebrew */
     background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-    color: black; /* Changed from blue to black */
+    color: black;
     text-align: center;
     direction: rtl;
     padding: 20px;
@@ -22,10 +22,19 @@ body {
 }
 
 h1 {
-    font-family: 'Amatic SC', 'Guttman Yad', cursive; /* Fancy decorative font, fallback to a decorative Hebrew font */
+    font-family: 'Amatic SC', 'Rubik', cursive; /* Keeping Amatic SC for headings, with Rubik as Hebrew fallback */
     font-size: 2.5rem;
-    color: black; /* Changed from blue to black */
+    color: black;
     margin-bottom: 1rem;
+}
+
+input, button {
+    font-family: 'Assistant', 'Rubik', sans-serif;
+    font-size: 18px;
+    padding: 10px;
+    margin: 10px;
+    border: 2px solid black;
+    border-radius: 5px;
 }
 
 input {
