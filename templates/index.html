@@ -21,14 +21,6 @@ body {
     margin: 0;
     line-height: 1.6;
 }
-/* Prevent scrolling back to the input field */
-body.input-focused {
-    position: fixed;
-    width: 100%;
-    overflow: hidden;
-}
-
-
 
 h1 {
     font-family: 'Amatic SC', 'Fredoka', cursive; /* Keeping Amatic SC for headings, with Fredoka as Hebrew fallback */
@@ -127,26 +119,6 @@ th, td {
     max-width: 400px;
 }
 
-#city-input {
-    position: sticky;
-    top: 10px; /* Distance from the top of the viewport */
-    z-index: 1000; /* Ensure it stays above other content */
-    width: 100%; /* Ensure it fills the width */
-    padding: 10px; /* Optional padding for better appearance */
-}
-
-.input-container {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%); /* Center the container horizontally */
-    width: auto; /* Let it fit the content */
-    padding: 10px;
-    background-color: white;
-    box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.2);
-}
-
-
 .modal-content button {
     margin: 10px 5px;
 }
@@ -243,21 +215,6 @@ th, td {
         text-align: center;
         margin-bottom: 10px;
     }
-
-    .input-container {
-        padding: 5px;
-        bottom: 10px;
-    }
-
-    #city-input {
-        font-size: 16px;
-        padding: 8px;
-    }
-
-    button {
-        font-size: 16px;
-        padding: 8px;
-    }
 }
 
 /* Additional improvements for larger screens */
@@ -300,13 +257,11 @@ th, td {
             });
         });
 
-
-
     </script>
     
     <h1>כמה יישובים בארץ אתה מכיר?</h1>
 
-    <input type="text" id="city-input" placeholder="כתוב יישוב..." autocomplete="off" autofocus="off">
+    <input type="text" id="city-input" placeholder="כתוב יישוב..." autocomplete="off">
     <button onclick="submitCity()">שלח</button>
     <button id="give-up-button">נכנעת?</button>
 
