@@ -155,7 +155,12 @@ def initialize_map():
 @app.route('/')
 def index():
     initialize_map()  # Ensure the map is initialized
+    
+    # Use session.get() to avoid KeyError if 'guessed_cities' doesn't exist
+    session['guessed_cities'] = session.get('guessed_cities', [])
+    
     return render_template('index.html', guessed_cities=session['guessed_cities'])
+
 
 
 # Helper function to normalize city names by removing special characters and converting to lowercase
