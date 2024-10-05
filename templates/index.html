@@ -657,24 +657,25 @@ th, td {
         });
 
         function endGame(data) {
-                // Hide remaining game elements
-                hideGameElements();
-                hideLeaderboardEntry();
+            // Hide remaining game elements
+            hideGameElements();
+            hideLeaderboardEntry();
 
-                // Update the map container to show game stats instead
-                const mapContainer = document.querySelector('.map-container');
-                const gameStatsContent = `
-                    <h2>סיכום המשחק שלך</h2>
-                    <p>מספר יישובים שמצאת: ${data.cities_found}</p>
-                    <p>5 היישובים הקטנים ביותר שמצאת: ${data.smallest_cities.join(', ')}</p>
-                    <p>אחוז מהאוכלוסייה שמצאת: ${data.population_percentage.toFixed(2)}%</p>
-                    <button id="new-game-button">התחל משחק חדש</button>
-                `;
-                mapContainer.innerHTML = gameStatsContent;
+            // Update the map container to show game stats instead
+            const mapContainer = document.querySelector('.map-container');
+            const gameStatsContent = `
+                <h2 style="font-family: 'Fredoka', 'Playfair Display', 'Amatic SC';">סיכום המשחק שלך</h2>
+                <p style="font-family: 'Fredoka', 'Playfair Display', 'Amatic SC';">מספר יישובים שמצאת: ${data.cities_found}</p>
+                <p style="font-family: 'Fredoka', 'Playfair Display', 'Amatic SC';">5 היישובים הקטנים ביותר שמצאת: ${data.smallest_cities.join(', ')}</p>
+                <p style="font-family: 'Fredoka', 'Playfair Display', 'Amatic SC';">אחוז מהאוכלוסייה שמצאת: ${data.population_percentage.toFixed(2)}%</p>
+                <button id="new-game-button" style="font-family: 'Fredoka', 'Playfair Display', 'Amatic SC';">התחל משחק חדש</button>
+            `;
+            mapContainer.innerHTML = gameStatsContent;
 
-                // Add event listener for the "Start New Game" button
-                document.getElementById('new-game-button').addEventListener('click', startNewGame);
-            }
+            // Add event listener for the "Start New Game" button
+            document.getElementById('new-game-button').addEventListener('click', startNewGame);
+}
+
 
 
 
