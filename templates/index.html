@@ -9,147 +9,169 @@
 /* Import Google Fonts for fancier options */
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Amatic+SC:wght@400;700&display=swap');
 
-/* Import modern, readable fonts that support both Hebrew and English */
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700&family=Poppins:wght@300;400;700&display=swap');
-
-/* Reset and base styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+/* Base styles */
 body {
-    font-family: 'Heebo', 'Poppins', sans-serif;
-    background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
-    color: #333;
-    line-height: 1.6;
+    font-family: 'Assistant', 'Rubik', sans-serif; /* Assistant for English, Rubik for Hebrew */
+    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+    color: black;
+    text-align: center;
+    direction: rtl;
     padding: 20px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    margin: 0;
+    line-height: 1.6;
 }
 
-/* Typography */
 h1 {
+    font-family: 'Amatic SC', 'Rubik', cursive; /* Keeping Amatic SC for headings, with Rubik as Hebrew fallback */
     font-size: 2.5rem;
-    color: #2c3e50;
+    color: black;
     margin-bottom: 1rem;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
 }
 
-/* Layout */
-.container {
-    width: 100%;
-    max-width: 800px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 15px;
-    padding: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 2rem;
-}
-
-/* Form elements */
 input, button {
-    font-family: 'Heebo', 'Poppins', sans-serif;
-    font-size: 1rem;
-    padding: 0.8rem 1rem;
-    margin: 0.5rem 0;
-    border: 2px solid #3498db;
-    border-radius: 8px;
-    transition: all 0.3s ease;
+    font-family: 'Assistant', 'Rubik', sans-serif;
+    font-size: 18px;
+    padding: 10px;
+    margin: 10px;
+    border: 2px solid black;
+    border-radius: 5px;
 }
 
 input {
-    width: 100%;
-    background-color: #ecf0f1;
+    font-family: 'Playfair Display', 'David Libre', 'Amatic SC';
+    font-size: 18px;
+    padding: 10px;
+    margin: 10px;
+    width: 300px;
+    border: 2px solid black; /* Changed from blue to black */
+    border-radius: 5px;
 }
 
-input:focus {
-    outline: none;
-    border-color: #2980b9;
-    box-shadow: 0 0 0 2px rgba(41, 128, 185, 0.3);
-}
-
+/* Reverted to original button style */
 button {
-    background-color: #3498db;
-    color: white;
+    font-family: 'Playfair Display', 'David Libre', 'Amatic SC';
+    font-size: 18px;
+    padding: 10px;
+    margin: 10px;
+    background-color: lightblue;
+    border: 2px solid black; /* Changed from blue to black */
+    color: black; /* Changed to black for better contrast on lightblue */
     cursor: pointer;
-    border: none;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
+    border-radius: 5px;
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: #0056b3; /* Darker blue on hover */
+    color: white; /* White text on hover for contrast */
 }
 
-/* Map container */
 .map-container {
-    width: 100%;
-    height: 50vh;
-    border: 2px solid #3498db;
-    border-radius: 15px;
-    overflow: hidden;
-    margin-top: 1rem;
+    margin: 20px auto;
+    width: 95%;
+    max-width: 800px;
+    height: 60vh;
+    border: 2px solid black; /* Changed from blue to black */
 }
 
-/* Table styles */
+.feedback {
+    font-size: 1.2rem;
+    margin: 1rem 0;
+}
+
+.guessed-cities-table {
+    margin: 20px auto;
+    width: 100%;
+    max-width: 600px;
+    font-size: 1rem;
+    color: black;
+}
+
 table {
     width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 0.5rem;
-    margin-top: 1rem;
+    border-collapse: collapse;
 }
 
 th, td {
-    padding: 0.8rem;
-    text-align: right;
-    background-color: #ecf0f1;
-    border-radius: 8px;
+    padding: 10px;
+    border: 1px solid black; /* Changed from blue to black */
 }
 
-th {
-    background-color: #3498db;
-    color: white;
-    font-weight: bold;
+#population-info, #timer {
+    margin-top: 20px;
+    font-size: 1rem;
 }
 
 /* Modal styles */
-.modal {
+#give-up-modal, #leaderboard-entry {
     display: none;
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     background-color: white;
-    padding: 2rem;
-    border-radius: 15px;
-    max-width: 90%;
-    width: 400px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border: 2px solid black; /* Changed from blue to black */
+    border-radius: 10px;
+    z-index: 9999;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 400px;
 }
 
-/* Utility classes */
-.text-center {
-    text-align: center;
+.modal-content button {
+    margin: 10px 5px;
 }
 
-.mt-1 {
-    margin-top: 1rem;
+/* Animations */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
 }
 
-/* Responsive design */
-@media (max-width: 768px) {
+.shake {
+    animation: shake 0.3s;
+}
+
+.celebration {
+    background-color: yellow;
+    border-radius: 50%;
+    padding: 20px;
+    animation: celebration 1s ease-in-out infinite;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes celebration {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50% { transform: translate(-50%, -50%) scale(1.2); }
+}
+
+/* Copyright and contact styles */
+.top-left-corner {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    text-align: left;
+    color: black; /* Changed from blue to black */
+    font-size: 0.8rem;
+}
+
+.top-left-corner a {
+    color: black; /* Changed from blue to black */
+    text-decoration: none;
+}
+
+.top-left-corner a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive styles */
+@media only screen and (max-width: 600px) {
     body {
+        font-size: 16px;
         padding: 10px;
     }
 
@@ -157,34 +179,51 @@ th {
         font-size: 2rem;
     }
 
-    .container {
-        padding: 1rem;
+    input, button {
+        font-size: 16px;
+        padding: 10px;
+        margin: 8px auto;
+        width: 90%;
+    }
+
+    .map-container {
+        height: 50vh;
+    }
+
+    table {
+        font-size: 0.9rem;
+    }
+
+    #show-leaderboard-btn {
+        padding: 10px;
+        font-size: 16px;
+        margin-top: 15px;
+    }
+
+    #give-up-modal, #leaderboard-entry {
+        padding: 15px;
+    }
+
+    .top-left-corner {
+        position: static;
+        text-align: center;
+        margin-bottom: 10px;
+    }
+}
+
+/* Additional improvements for larger screens */
+@media only screen and (min-width: 1024px) {
+    body {
+        font-size: 18px;
+    }
+
+    .map-container {
+        height: 70vh;
     }
 
     input, button {
-        font-size: 0.9rem;
-        padding: 0.7rem 0.9rem;
+        width: auto; /* Allow buttons to size based on content */
     }
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
-/* RTL Support */
-[dir="rtl"] {
-    text-align: right;
-}
-
-[dir="rtl"] input,
-[dir="rtl"] button {
-    text-align: right;
 }
     </style>
     <!-- Load Leaflet.js library for interactive map -->
