@@ -333,5 +333,5 @@ def load_data_from_file(file_path='data.csv'):
 if __name__ == "__main__":
     city_data_dict = load_data_from_file('data.csv')
     init_db()
-    reset_game_state()
+    #reset_game_state()
     app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)), debug=True)
