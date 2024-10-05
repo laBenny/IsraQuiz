@@ -21,6 +21,12 @@ body {
     margin: 0;
     line-height: 1.6;
 }
+/* Prevent body from scrolling when keyboard is shown */
+body.input-focused {
+    position: fixed;
+    width: 100%;
+}
+
 
 h1 {
     font-family: 'Amatic SC', 'Fredoka', cursive; /* Keeping Amatic SC for headings, with Fredoka as Hebrew fallback */
