@@ -5,168 +5,191 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>כמה יישובים בארץ אתה מכיר?</title>
     <style>
-        body {
-            font-family: 'Alef', sans-serif;
-            background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
-            color: blue;
-            text-align: center;
-            direction: rtl;
-        }
+ body {
+    font-family: 'Alef', sans-serif;
+    background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%); /* Modern background */
+    color: blue;
+    text-align: center;
+    direction: rtl;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    justify-content: center;
+}
 
-        h1 {
-            font-size: 36px;
-            color: blue;
-        }
-        input {
-            font-size: 18px;
-            padding: 10px;
-            margin: 10px;
-            width: 300px;
-            border: 2px solid blue;
-            border-radius: 5px;
-        }
-        button {
-            font-size: 18px;
-            padding: 10px;
-            margin: 10px;
-            background-color: lightblue;
-            border: 2px solid blue;
-            color: white;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        button:hover {
-            background-color: blue;
-        }
-        .map-container {
-            margin-top: 20px;
-            width: 800px;
-            height: 600px;
-            display: inline-block;
-            border: 2px solid blue;
-        }
-        .feedback {
-            font-size: 20px;
-        }
-        .guessed-cities-table {
-            margin-top: 20px;
-            font-size: 18px;
-            color: black;
-        }
-        table {
-            width: 50%;
-            margin: 0 auto;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            border: 1px solid blue;
-        }
-        #population-info {
-            margin-top: 20px;
-            font-size: 18px;
-        }
-        #timer {
-            margin-top: 20px;
-            font-size: 18px;
-            color: blue;
-        }
-        /* Give Up Modal */
-        #give-up-modal, #leaderboard-entry {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border: 2px solid blue;
-            border-radius: 10px;
-            z-index: 9999; /* This ensures it's on top of everything, including the map */
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Optional: Add a shadow for better visibility */
-        }
+h1 {
+    font-size: 28px;
+    color: blue;
+}
 
-        .modal-content button {
-            margin-right: 10px;
-        }
-        /* Animation for shaking the input box */
-        @keyframes shake {
-            0% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-            100% { transform: translateX(0); }
-        }
-        .shake {
-            animation: shake 0.3s;
-        }
-        .celebration {
-            background-color: yellow;
-            border-radius: 50%;
-            padding: 20px;
-            animation: celebration 1s ease-in-out infinite;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        @keyframes celebration {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        /* Styling for copyright and contact */
-        .top-left-corner {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            text-align: left;
-            color: blue;
-        }
-        .top-left-corner a {
-            color: blue;
-            text-decoration: none;
-        }
-        .top-left-corner a:hover {
-            text-decoration: underline;
-        }
+input {
+    font-size: 16px;
+    padding: 10px;
+    margin: 10px;
+    width: 80%;
+    border: 2px solid blue;
+    border-radius: 5px;
+}
 
+button {
+    font-size: 16px;
+    padding: 10px;
+    margin: 10px;
+    background-color: #74ebd5;
+    border: 2px solid blue;
+    color: blue;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 80%; /* Make button width responsive */
+}
 
+button:hover {
+    background-color: #ACB6E5;
+    color: white;
+}
 
-        @media only screen and (max-width: 600px) {
-            body {
-                font-size: 14px;
-            }
-            input, button {
-            display: block;
-            margin: 10px auto; /* Centers them horizontally */
-            width: 80%; /* Ensures they are not too wide */
-        }
+.map-container {
+    width: 100%;
+    height: 50vw; /* Make the map responsive based on screen width */
+    margin: 20px 0;
+    display: inline-block;
+    border: 2px solid blue;
+}
 
-            .map-container {
-                width: 100%;
-                height: 300px;
-            }
-            table {
-                width: 100%;
-            }
-            #show-leaderboard-btn {
-                padding: 10px 20px;
-                font-size: 18px;
-                margin-top: 15px;
-            }
+.feedback {
+    font-size: 18px;
+}
 
-                    .map-container {
-                margin: 10px auto; /* Centers the map on mobile with a small margin */
-            }
-        
+.guessed-cities-table {
+    margin-top: 20px;
+    font-size: 16px;
+    color: black;
+}
 
-        #give-up-modal, #leaderboard-entry {
-            max-width: 90%; /* Ensure modals don't exceed the width of smaller screens */
-        }
-        }
+table {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
 
+th, td {
+    padding: 10px;
+    border: 1px solid blue;
+}
 
+#population-info {
+    margin-top: 20px;
+    font-size: 16px;
+}
+
+#timer {
+    margin-top: 20px;
+    font-size: 18px;
+    color: blue;
+}
+
+/* Make modals responsive */
+#give-up-modal, #leaderboard-entry {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 2px solid blue;
+    border-radius: 10px;
+    z-index: 9999;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 90%; /* Ensure modals don’t exceed mobile screen size */
+}
+
+.modal-content button {
+    margin-right: 10px;
+}
+
+/* Animation for shaking the input box */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+.shake {
+    animation: shake 0.3s;
+}
+
+/* Celebration animation */
+.celebration {
+    background-color: yellow;
+    border-radius: 50%;
+    padding: 20px;
+    animation: celebration 1s ease-in-out infinite;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes celebration {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Styling for copyright and contact */
+.top-left-corner {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    text-align: left;
+    color: blue;
+}
+
+.top-left-corner a {
+    color: blue;
+    text-decoration: none;
+}
+
+.top-left-corner a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive styles for mobile devices */
+@media only screen and (max-width: 600px) {
+    h1 {
+        font-size: 24px;
+    }
+
+    input, button {
+        display: block;
+        width: 90%;
+        margin: 10px auto;
+        font-size: 14px;
+    }
+
+    .map-container {
+        width: 100%;
+        height: 40vw; /* Reduce the map size on smaller screens */
+    }
+
+    table {
+        width: 100%;
+    }
+
+    #show-leaderboard-btn {
+        padding: 10px 20px;
+        font-size: 18px;
+        margin-top: 15px;
+    }
+
+    #give-up-modal, #leaderboard-entry {
+        max-width: 90%; /* Ensure modals don’t exceed the width of smaller screens */
+    }
+}
 
     </style>
     <!-- Load Leaflet.js library for interactive map -->
