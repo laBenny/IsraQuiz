@@ -269,20 +269,28 @@ th, td {
                 showLeaderboard(data.leaderboard); // Call your existing function to display the leaderboard
             });
         });
-        const inputField = document.getElementById('city-input');
 
-            inputField.addEventListener('focus', function() {
-                document.body.classList.add('input-focused');
+        
+        let scrollPos = window.pageYOffset;
+
+            document.getElementById('city-input').addEventListener('focus', function() {
+                // Lock the scroll position when input is focused
+                scrollPos = window.pageYOffset;
+                window.scrollTo(0, scrollPos);
+                
+                // Optionally, lock body scrolling completely
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${scrollPos}px`;
+                document.body.style.width = '100%';
             });
 
-            inputField.addEventListener('blur', function() {
-                document.body.classList.remove('input-focused');
+            document.getElementById('city-input').addEventListener('blur', function() {
+                // Re-enable scroll when input loses focus
+                document.body.style.position = '';
+                document.body.style.top = '';
+                window.scrollTo(0, scrollPos); // Restore the scroll position
             });
 
-            // Prevent the page from scrolling when touching the input field
-            inputField.addEventListener('touchstart', function(e) {
-                e.preventDefault();  // This prevents the page from scrolling
-            });
 
 
 
