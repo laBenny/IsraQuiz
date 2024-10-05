@@ -256,6 +256,12 @@ th, td {
                 showLeaderboard(data.leaderboard); // Call your existing function to display the leaderboard
             });
         });
+        document.getElementById('city-input').addEventListener('focus', function(event) {
+            // Prevent the default scroll behavior when input is focused
+            event.preventDefault();
+            // Optionally blur the element if needed, but this might prevent typing
+                });
+
 
     </script>
     
