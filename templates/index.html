@@ -23,16 +23,6 @@ h1 {
     margin-bottom: 1rem;
 }
 
-input, button {
-    font-size: 1rem;
-    padding: 12px;
-    margin: 10px;
-    border: 2px solid blue;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 300px;
-    box-sizing: border-box;
-}
 
 button {
     background-color: lightblue;
@@ -53,6 +43,16 @@ button:hover {
     border: 2px solid blue;
 }
 
+input, button {
+    font-size: 1rem;
+    padding: 12px;
+    margin: 10px;
+    border: 2px solid blue;
+    border-radius: 5px;
+    width: 300px; /* Set a fixed width for larger screens */
+    max-width: 100%; /* Ensure it doesn't overflow on small screens */
+    box-sizing: border-box;
+}
 .feedback {
     font-size: 1.2rem;
     margin: 1rem 0;
@@ -150,6 +150,13 @@ th, td {
 
 /* Responsive styles */
 @media only screen and (max-width: 600px) {
+
+
+    .map-container {
+        height: 50vh;
+        width: 95%; /* Slightly narrower on mobile */
+        max-width: none; /* Allow it to be narrower than 800px on mobile */
+    }
     body {
         font-size: 16px;
         padding: 10px;
@@ -164,10 +171,6 @@ th, td {
         padding: 10px;
         margin: 8px auto;
         width: 90%;
-    }
-
-    .map-container {
-        height: 50vh;
     }
 
     table {
@@ -203,6 +206,7 @@ th, td {
 
     input, button {
         font-size: 1.1rem;
+        width: 300px; /* Fixed width for larger screens */
     }
 }
 
